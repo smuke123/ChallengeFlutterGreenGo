@@ -1,0 +1,38 @@
+name: challengefluttergreengo
+description: "App de gestión de entregas sostenibles en bicicleta para GreenGo Logistics"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  provider: ^6.1.1
+
+  # Persistencia local
+  shared_preferences: ^2.2.2
+
+  # Formateo de fechas
+  intl: ^0.19.0
+
+  # UI
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Puedes agregar assets aquí si necesitas imágenes o animaciones
+  # assets:
+  #   - assets/images/
+  #   - assets/animations/
+
