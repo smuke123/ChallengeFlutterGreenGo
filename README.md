@@ -50,7 +50,17 @@ flutter create --platforms=<SISTEMA> .
 - Linux: `flutter create --platforms=linux .`
 - Android: `flutter create --platforms=android .`
 
-### 4. Ejecutar la aplicación
+### 4. Localización (i18n)
+La app soporta Español e Inglés. Se detecta automáticamente por el idioma del sistema.
+
+- Archivos de localización: `lib/l10n/app_es.arb`, `lib/l10n/app_en.arb`.
+- Para regenerar localizaciones:
+```bash
+flutter gen-l10n
+```
+- Para forzar un idioma (sólo pruebas), puedes establecer `locale` en `MaterialApp`.
+
+### 5. Ejecutar la aplicación
 Reemplaza `<SISTEMA>` con tu plataforma:
 
 ```bash
@@ -61,6 +71,11 @@ flutter run -d <SISTEMA>
 - Windows: `flutter run -d windows`
 - Linux: `flutter run -d linux`
 - Chrome: `flutter run -d chrome`
+
+### 6. Ejecutar pruebas
+```bash
+flutter test
+```
 
 ## 🎨 Autores
 

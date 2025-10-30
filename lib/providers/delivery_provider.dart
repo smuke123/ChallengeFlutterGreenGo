@@ -8,7 +8,7 @@ class DeliveryProvider with ChangeNotifier {
   List<Delivery> _deliveries = [];
   static const String _deliveriesKey = 'deliveries';
 
-  List<Delivery> get deliveries => _deliveries;
+  List<Delivery> get deliveries => List.unmodifiable(_deliveries);
 
   DeliveryProvider() {
     _loadDeliveries();
@@ -39,10 +39,20 @@ class DeliveryProvider with ChangeNotifier {
     await prefs.setString(_deliveriesKey, encoded);
   }
 
-  // Marcar como entregado
+  // Marcar como entregado (inmutable)
   Future<void> markAsDelivered(int id) async {
-    final delivery = _deliveries.firstWhere((d) => d.id == id);
-    delivery.delivered = true;
+    _deliveries = _deliveries
+        .map((d) => d.id == id ? d.copyWith(delivered: true) : d)
+        .toList(growable: false);
+    await _saveDeliveries();
+    notifyListeners();
+  }
+
+  // Alternar estado de entrega (inmutable)
+  Future<void> toggleDelivered(int id) async {
+    _deliveries = _deliveries
+        .map((d) => d.id == id ? d.copyWith(delivered: !d.delivered) : d)
+        .toList(growable: false);
     await _saveDeliveries();
     notifyListeners();
   }
@@ -56,7 +66,23 @@ class DeliveryProvider with ChangeNotifier {
 
   // Agregar nueva entrega
   Future<void> addDelivery(Delivery delivery) async {
-    _deliveries.add(delivery);
+    _deliveries = [..._deliveries, delivery];
+    await _saveDeliveries();
+    notifyListeners();
+  }
+
+  // Actualizar una entrega por id (inmutable)
+  Future<void> updateDelivery(int id, Delivery updated) async {
+    _deliveries = _deliveries
+        .map((d) => d.id == id ? updated : d)
+        .toList(growable: false);
+    await _saveDeliveries();
+    notifyListeners();
+  }
+
+  // Eliminar una entrega por id (inmutable)
+  Future<void> removeDelivery(int id) async {
+    _deliveries = _deliveries.where((d) => d.id != id).toList(growable: false);
     await _saveDeliveries();
     notifyListeners();
   }

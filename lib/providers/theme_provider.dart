@@ -31,6 +31,8 @@ class ThemeProvider with ChangeNotifier {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      visualDensity: VisualDensity.standard,
+      typography: Typography.material2021(),
       colorScheme: ColorScheme.fromSeed(
         seedColor: const Color(0xFF4CAF50), // Verde GreenGo
         brightness: Brightness.light,
@@ -41,10 +43,22 @@ class ThemeProvider with ChangeNotifier {
         backgroundColor: Color(0xFF4CAF50),
         foregroundColor: Colors.white,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        showCloseIcon: true,
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        border: OutlineInputBorder(),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -59,6 +73,8 @@ class ThemeProvider with ChangeNotifier {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      visualDensity: VisualDensity.standard,
+      typography: Typography.material2021(),
       colorScheme: ColorScheme.fromSeed(
         seedColor: const Color(0xFF66BB6A), // Verde más claro para dark
         brightness: Brightness.dark,
@@ -69,10 +85,22 @@ class ThemeProvider with ChangeNotifier {
         backgroundColor: Color(0xFF1B5E20),
         foregroundColor: Colors.white,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        showCloseIcon: true,
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        border: OutlineInputBorder(),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(

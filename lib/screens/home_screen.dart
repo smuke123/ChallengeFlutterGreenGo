@@ -4,6 +4,7 @@ import '../providers/theme_provider.dart';
 import '../widgets/animated_bike.dart';
 import 'delivery_list_screen.dart';
 import 'supervisor_screen.dart';
+import 'package:challengefluttergreengo/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -63,9 +64,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '🚴 GreenGo Logistics',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.homeTitle,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -83,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
             onPressed: () => themeProvider.toggleTheme(),
-            tooltip: 'Cambiar tema',
+            tooltip: AppLocalizations.of(context)!.toggleThemeTooltip,
           ),
         ],
       ),
@@ -120,16 +121,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                       ],
                     ),
-                    child: Icon(
-                      Icons.pedal_bike,
-                      size: 80,
-                      color: colorScheme.primary,
+                    child: Semantics(
+                      label: 'Logotipo bicicleta GreenGo',
+                      child: Icon(
+                        Icons.pedal_bike,
+                        size: 80,
+                        color: colorScheme.primary,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 30),
                 Text(
-                  'Entregas Sostenibles',
+                  AppLocalizations.of(context)!.appTitle,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: colorScheme.primary,
@@ -139,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Text(
-                    'Coordinación de repartidores en bicicleta para una ciudad más verde',
+                    AppLocalizations.of(context)!.homeSubtitle,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurface.withOpacity(0.7),
@@ -158,9 +162,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       _buildMenuButton(
                         context: context,
                         icon: Icons.delivery_dining,
-                        title: 'Modo Repartidor',
-                        subtitle: 'Ver y gestionar mis entregas',
-                        color: Colors.blue,
+                        title: AppLocalizations.of(context)!.homeMenuCourierTitle,
+                        subtitle: AppLocalizations.of(context)!.homeMenuCourierSubtitle,
+                        color: colorScheme.primary,
                         onTap: () {
                           Navigator.of(context).push(
                             _createSlideRoute(const DeliveryListScreen()),
@@ -171,9 +175,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       _buildMenuButton(
                         context: context,
                         icon: Icons.supervisor_account,
-                        title: 'Modo Supervisor',
-                        subtitle: 'Monitorear todas las entregas',
-                        color: Colors.orange,
+                        title: AppLocalizations.of(context)!.homeMenuSupervisorTitle,
+                        subtitle: AppLocalizations.of(context)!.homeMenuSupervisorSubtitle,
+                        color: colorScheme.secondary,
                         onTap: () {
                           Navigator.of(context).push(
                             _createSlideRoute(const SupervisorScreen()),

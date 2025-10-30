@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:challengefluttergreengo/l10n/app_localizations.dart';
 
 class ProgressBar extends StatefulWidget {
   final double progress;
@@ -65,11 +66,11 @@ class _ProgressBarState extends State<ProgressBar>
                     Icon(
                       Icons.trending_up,
                       size: 20,
-                      color: _getProgressColor(percentage),
+                      color: _getProgressColor(context, percentage),
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Progreso de entregas',
+                      AppLocalizations.of(context)!.progressTitle,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -82,7 +83,7 @@ class _ProgressBarState extends State<ProgressBar>
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: _getProgressColor(percentage).withOpacity(0.2),
+                    color: _getProgressColor(context, percentage).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -90,63 +91,68 @@ class _ProgressBarState extends State<ProgressBar>
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: _getProgressColor(percentage),
+                      color: _getProgressColor(context, percentage),
                     ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            Stack(
-              children: [
-                Container(
-                  height: 16,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  height: 16,
-                  width: MediaQuery.of(context).size.width * _animation.value,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        _getProgressColor(percentage),
-                        _getProgressColor(percentage).withOpacity(0.7),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: _getProgressColor(percentage).withOpacity(0.5),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                ),
-                if (percentage == 100)
-                  Positioned.fill(
-                    child: Center(
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0.8, end: 1.2),
-                        duration: const Duration(milliseconds: 500),
-                        builder: (context, scale, child) {
-                          return Transform.scale(
-                            scale: scale,
-                            child: const Icon(
-                              Icons.celebration,
-                              color: Colors.white,
-                              size: 14,
-                            ),
-                          );
-                        },
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final barWidth = constraints.maxWidth;
+                return Stack(
+                  children: [
+                    Container(
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                  ),
-              ],
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      height: 16,
+                      width: barWidth * _animation.value,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            _getProgressColor(context, percentage),
+                            _getProgressColor(context, percentage).withOpacity(0.7),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _getProgressColor(context, percentage).withOpacity(0.5),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (percentage == 100)
+                      Positioned.fill(
+                        child: Center(
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0.8, end: 1.2),
+                            duration: const Duration(milliseconds: 500),
+                            builder: (context, scale, child) {
+                              return Transform.scale(
+                                scale: scale,
+                                child: const Icon(
+                                  Icons.celebration,
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 8),
             Text(
@@ -162,17 +168,17 @@ class _ProgressBarState extends State<ProgressBar>
     );
   }
 
-  Color _getProgressColor(int percentage) {
+  Color _getProgressColor(BuildContext context, int percentage) {
     if (percentage == 0) {
-      return Colors.grey;
+      return Theme.of(context).colorScheme.outline;
     } else if (percentage < 30) {
-      return Colors.red;
+      return Theme.of(context).colorScheme.error;
     } else if (percentage < 60) {
-      return Colors.orange;
+      return Theme.of(context).colorScheme.secondary;
     } else if (percentage < 100) {
-      return Colors.blue;
+      return Theme.of(context).colorScheme.primary;
     } else {
-      return Colors.green;
+      return Theme.of(context).colorScheme.tertiary;
     }
   }
 

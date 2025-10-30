@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../providers/delivery_provider.dart';
 import '../widgets/progress_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:challengefluttergreengo/l10n/app_localizations.dart';
+import 'package:flutter/services.dart';
 
 class SupervisorScreen extends StatefulWidget {
   const SupervisorScreen({super.key});
@@ -13,25 +15,55 @@ class SupervisorScreen extends StatefulWidget {
 
 class _SupervisorScreenState extends State<SupervisorScreen> {
   String _filterStatus = 'all'; // all, pending, completed
+  String _searchQuery = '';
+  String _sortKey = 'time_desc'; // time_asc, time_desc, status, district
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<DeliveryProvider>(context);
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Filtrar entregas
-    List filteredDeliveries = provider.deliveries;
+    // Filtrar por estado
+    List filteredDeliveries = List.of(provider.deliveries);
     if (_filterStatus == 'pending') {
       filteredDeliveries = provider.pendingDeliveries;
     } else if (_filterStatus == 'completed') {
       filteredDeliveries = provider.completedDeliveries;
     }
 
+    // Filtrar por búsqueda (cliente/dirección/distrito)
+    if (_searchQuery.isNotEmpty) {
+      final q = _searchQuery.toLowerCase();
+      filteredDeliveries = filteredDeliveries.where((d) {
+        return d.clientName.toLowerCase().contains(q) ||
+            d.address.toLowerCase().contains(q) ||
+            d.district.toLowerCase().contains(q);
+      }).toList();
+    }
+
+    // Ordenar
+    filteredDeliveries.sort((a, b) {
+      switch (_sortKey) {
+        case 'time_asc':
+          return a.orderTime.compareTo(b.orderTime);
+        case 'time_desc':
+          return b.orderTime.compareTo(a.orderTime);
+        case 'status':
+          // Pendientes primero
+          if (a.delivered == b.delivered) return 0;
+          return a.delivered ? 1 : -1;
+        case 'district':
+          return a.district.toLowerCase().compareTo(b.district.toLowerCase());
+        default:
+          return 0;
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '👨‍💼 Panel del Supervisor',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.supervisorTitle,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
@@ -55,27 +87,27 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                     Expanded(
                       child: _buildDashboardCard(
                         context,
-                        '📦 Total',
+                        '📦 ' + AppLocalizations.of(context)!.statTotal,
                         provider.deliveries.length.toString(),
-                        Colors.blue,
+                        Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildDashboardCard(
                         context,
-                        '⏳ Pendientes',
+                        '⏳ ' + AppLocalizations.of(context)!.statPending,
                         provider.pendingCount.toString(),
-                        Colors.orange,
+                        Theme.of(context).colorScheme.secondary,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildDashboardCard(
                         context,
-                        '✅ Completadas',
+                        '✅ ' + AppLocalizations.of(context)!.statCompleted,
                         provider.completedCount.toString(),
-                        Colors.green,
+                        Theme.of(context).colorScheme.tertiary,
                       ),
                     ),
                   ],
@@ -91,21 +123,53 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                const Text(
-                  'Filtrar:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                Text(AppLocalizations.of(context)!.filter, style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(width: 12),
                 Expanded(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _buildFilterChip('Todas', 'all', provider.deliveries.length),
+                        _buildFilterChip(AppLocalizations.of(context)!.filterAll, 'all', provider.deliveries.length),
                         const SizedBox(width: 8),
-                        _buildFilterChip('Pendientes', 'pending', provider.pendingCount),
+                        _buildFilterChip(AppLocalizations.of(context)!.filterPending, 'pending', provider.pendingCount),
                         const SizedBox(width: 8),
-                        _buildFilterChip('Completadas', 'completed', provider.completedCount),
+                        _buildFilterChip(AppLocalizations.of(context)!.filterCompleted, 'completed', provider.completedCount),
+                        const SizedBox(width: 12),
+                        // Buscador
+                        SizedBox(
+                          width: 220,
+                          child: TextField(
+                            decoration: InputDecoration(
+                              isDense: true,
+                              prefixIcon: const Icon(Icons.search),
+                              hintText: AppLocalizations.of(context)!.searchHint,
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                _searchQuery = value.trim();
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        // Ordenamiento
+                        DropdownButton<String>(
+                          value: _sortKey,
+                          underline: const SizedBox.shrink(),
+                          items: [
+                            DropdownMenuItem(value: 'time_desc', child: Text(AppLocalizations.of(context)!.sortNewest)),
+                            DropdownMenuItem(value: 'time_asc', child: Text(AppLocalizations.of(context)!.sortOldest)),
+                            DropdownMenuItem(value: 'status', child: Text(AppLocalizations.of(context)!.sortStatus)),
+                            DropdownMenuItem(value: 'district', child: Text(AppLocalizations.of(context)!.sortDistrict)),
+                          ],
+                          onChanged: (value) {
+                            if (value == null) return;
+                            setState(() {
+                              _sortKey = value;
+                            });
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -128,7 +192,7 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No hay entregas en esta categoría',
+                          AppLocalizations.of(context)!.emptyCategory,
                           style: TextStyle(
                             color: colorScheme.onSurface.withOpacity(0.5),
                             fontSize: 16,
@@ -166,8 +230,8 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: delivery.delivered
-                                    ? Colors.green.withOpacity(0.1)
-                                    : Colors.orange.withOpacity(0.1),
+                                    ? Theme.of(context).colorScheme.tertiary.withOpacity(0.1)
+                                    : Theme.of(context).colorScheme.secondary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
@@ -175,8 +239,8 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                                     ? Icons.check_circle
                                     : Icons.pedal_bike,
                                 color: delivery.delivered
-                                    ? Colors.green
-                                    : Colors.orange,
+                                    ? Theme.of(context).colorScheme.tertiary
+                                    : Theme.of(context).colorScheme.secondary,
                                 size: 28,
                               ),
                             ),
@@ -230,25 +294,86 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
                                 ),
                               ],
                             ),
-                            trailing: delivery.delivered
-                                ? const Chip(
-                                    label: Text(
-                                      'Entregado',
-                                      style: TextStyle(fontSize: 10),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                delivery.delivered
+                                    ? Chip(
+                                        label: Text(
+                                          AppLocalizations.of(context)!.chipDelivered,
+                                          style: const TextStyle(fontSize: 10),
+                                        ),
+                                        backgroundColor: Theme.of(context).colorScheme.tertiary,
+                                        labelStyle: const TextStyle(color: Colors.white),
+                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                      )
+                                    : Chip(
+                                        label: Text(
+                                          AppLocalizations.of(context)!.chipOnRoute,
+                                          style: const TextStyle(fontSize: 10),
+                                        ),
+                                        backgroundColor: Theme.of(context).colorScheme.secondary,
+                                        labelStyle: const TextStyle(color: Colors.white),
+                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                      ),
+                                const SizedBox(width: 8),
+                                PopupMenuButton<_SupervisorAction>(
+                                  tooltip: AppLocalizations.of(context)!.moreOptions,
+                                  onSelected: (action) async {
+                                    switch (action) {
+                                      case _SupervisorAction.toggle:
+                                        HapticFeedback.selectionClick();
+                                        await provider.toggleDelivered(delivery.id);
+                                        break;
+                                      case _SupervisorAction.remove:
+                                        final removed = delivery;
+                                        HapticFeedback.vibrate();
+                                        await provider.removeDelivery(delivery.id);
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(AppLocalizations.of(context)!.snackRemoved),
+                                              behavior: SnackBarBehavior.floating,
+                                              action: SnackBarAction(
+                                                label: AppLocalizations.of(context)!.undo,
+                                                onPressed: () async {
+                                                  await provider.addDelivery(removed);
+                                                },
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        break;
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    PopupMenuItem(
+                                      value: _SupervisorAction.toggle,
+                                      child: Row(
+                                        children: [
+                                          Icon(delivery.delivered ? Icons.undo : Icons.check),
+                                          const SizedBox(width: 8),
+                                          Text(delivery.delivered
+                                              ? AppLocalizations.of(context)!.markPending
+                                              : AppLocalizations.of(context)!.markDelivered),
+                                        ],
+                                      ),
                                     ),
-                                    backgroundColor: Colors.green,
-                                    labelStyle: TextStyle(color: Colors.white),
-                                    padding: EdgeInsets.symmetric(horizontal: 8),
-                                  )
-                                : const Chip(
-                                    label: Text(
-                                      'En ruta',
-                                      style: TextStyle(fontSize: 10),
+                                    const PopupMenuDivider(),
+                                    PopupMenuItem(
+                                      value: _SupervisorAction.remove,
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.delete_outline),
+                                          const SizedBox(width: 8),
+                                          Text(AppLocalizations.of(context)!.remove),
+                                        ],
+                                      ),
                                     ),
-                                    backgroundColor: Colors.orange,
-                                    labelStyle: TextStyle(color: Colors.white),
-                                    padding: EdgeInsets.symmetric(horizontal: 8),
-                                  ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -326,3 +451,5 @@ class _SupervisorScreenState extends State<SupervisorScreen> {
     );
   }
 }
+
+enum _SupervisorAction { toggle, remove }

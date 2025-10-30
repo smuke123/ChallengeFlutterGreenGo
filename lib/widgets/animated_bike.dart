@@ -38,46 +38,54 @@ class _AnimatedBikeState extends State<AnimatedBike>
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
-          return Stack(
-            children: [
-              // Línea de ruta
-              Positioned(
-                left: 20,
-                right: 20,
-                top: 50,
-                child: Container(
-                  height: 2,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                        Theme.of(context).colorScheme.primary,
-                        Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                      ],
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final maxWidth = constraints.maxWidth;
+              return Stack(
+                children: [
+                  // Línea de ruta
+                  Positioned(
+                    left: 20,
+                    right: 20,
+                    top: 50,
+                    child: Container(
+                      height: 2,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                            Theme.of(context).colorScheme.primary,
+                            Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              // Bicicleta en movimiento
-              Positioned(
-                left: (_animation.value + 1) * (MediaQuery.of(context).size.width - 100) / 2,
-                top: 20,
-                child: TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  duration: const Duration(milliseconds: 800),
-                  builder: (context, value, child) {
-                    return Transform.scale(
-                      scale: 0.8 + (value * 0.2),
-                      child: Icon(
-                        Icons.pedal_bike,
-                        size: 60,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
+                  // Bicicleta en movimiento
+                  Positioned(
+                    left: (_animation.value + 1) * (maxWidth - 100) / 2,
+                    top: 20,
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 800),
+                      builder: (context, value, child) {
+                        return Transform.scale(
+                          scale: 0.8 + (value * 0.2),
+                          child: Semantics(
+                            label: 'Bicicleta animada',
+                            child: Icon(
+                              Icons.pedal_bike,
+                              size: 60,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
           );
         },
       ),

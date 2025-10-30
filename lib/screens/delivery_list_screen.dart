@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/delivery_provider.dart';
 import '../widgets/delivery_card.dart';
 import '../widgets/progress_bar.dart';
+import 'package:challengefluttergreengo/l10n/app_localizations.dart';
 
 class DeliveryListScreen extends StatefulWidget {
   const DeliveryListScreen({super.key});
@@ -34,13 +35,13 @@ class _DeliveryListScreenState extends State<DeliveryListScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '📦 Mis Entregas',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.deliveriesTitle,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
+          indicatorColor: Theme.of(context).appBarTheme.foregroundColor ?? colorScheme.onPrimary,
           indicatorWeight: 3,
           tabs: [
             Tab(
@@ -48,14 +49,14 @@ class _DeliveryListScreenState extends State<DeliveryListScreen>
                 label: Text('${provider.pendingCount}'),
                 child: const Icon(Icons.pending_actions),
               ),
-              text: 'Pendientes',
+              text: AppLocalizations.of(context)!.tabPending,
             ),
             Tab(
               icon: Badge(
                 label: Text('${provider.completedCount}'),
                 child: const Icon(Icons.check_circle),
               ),
-              text: 'Completadas',
+              text: AppLocalizations.of(context)!.tabCompleted,
             ),
           ],
         ),
@@ -82,24 +83,24 @@ class _DeliveryListScreenState extends State<DeliveryListScreen>
                   children: [
                     _buildStatCard(
                       context,
-                      'Total',
+                      AppLocalizations.of(context)!.statTotal,
                       provider.deliveries.length.toString(),
                       Icons.inventory_2,
-                      Colors.blue,
+                      colorScheme.primary,
                     ),
                     _buildStatCard(
                       context,
-                      'Pendientes',
+                      AppLocalizations.of(context)!.statPending,
                       provider.pendingCount.toString(),
                       Icons.hourglass_empty,
-                      Colors.orange,
+                      colorScheme.secondary,
                     ),
                     _buildStatCard(
                       context,
-                      'Completadas',
+                      AppLocalizations.of(context)!.statCompleted,
                       provider.completedCount.toString(),
                       Icons.check_circle,
-                      Colors.green,
+                      colorScheme.tertiary,
                     ),
                   ],
                 ),
@@ -116,12 +117,12 @@ class _DeliveryListScreenState extends State<DeliveryListScreen>
                 // Pendientes
                 _buildDeliveryList(
                   provider.pendingDeliveries,
-                  'No hay entregas pendientes 🎉',
+              AppLocalizations.of(context)!.emptyPending,
                 ),
                 // Completadas
                 _buildDeliveryList(
                   provider.completedDeliveries,
-                  'Aún no has completado entregas',
+              AppLocalizations.of(context)!.emptyCompleted,
                 ),
               ],
             ),
@@ -135,7 +136,7 @@ class _DeliveryListScreenState extends State<DeliveryListScreen>
                 _showResetDialog(context, provider);
               },
               icon: const Icon(Icons.refresh),
-              label: const Text('Reiniciar'),
+              label: Text(AppLocalizations.of(context)!.reset),
             ),
     );
   }
@@ -220,27 +221,25 @@ class _DeliveryListScreenState extends State<DeliveryListScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reiniciar entregas'),
-        content: const Text(
-          '¿Deseas reiniciar todas las entregas? Esto marcará todas como pendientes.',
-        ),
+        title: Text(AppLocalizations.of(context)!.resetDialogTitle),
+        content: Text(AppLocalizations.of(context)!.resetDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () {
               provider.resetDeliveries();
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('✅ Entregas reiniciadas'),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.snackReset),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
             },
-            child: const Text('Reiniciar'),
+            child: Text(AppLocalizations.of(context)!.reset),
           ),
         ],
       ),

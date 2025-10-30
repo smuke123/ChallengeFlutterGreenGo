@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../models/delivery.dart';
 import '../providers/delivery_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:challengefluttergreengo/l10n/app_localizations.dart';
+import 'package:flutter/services.dart';
 
 class DeliveryCard extends StatefulWidget {
   final Delivery delivery;
@@ -168,59 +170,120 @@ class _DeliveryCardState extends State<DeliveryCard>
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Botón de entrega
-                if (!widget.delivery.delivered)
-                  Material(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(12),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () async {
-                        await provider.markAsDelivered(widget.delivery.id);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  const Icon(Icons.check_circle, color: Colors.white),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      '✅ Entrega a ${widget.delivery.clientName} completada',
-                                    ),
+                // Acciones: entregar/toggle + menú contextual
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (!widget.delivery.delivered)
+                      Material(
+                        color: Theme.of(context).colorScheme.tertiary,
+                        borderRadius: BorderRadius.circular(12),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () async {
+                            HapticFeedback.selectionClick();
+                            await provider.markAsDelivered(widget.delivery.id);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(Icons.check_circle, color: Colors.white),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(AppLocalizations.of(context)!
+                                            .snackDelivered(widget.delivery.clientName)),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              backgroundColor: Colors.green,
-                              behavior: SnackBarBehavior.floating,
-                              duration: const Duration(seconds: 2),
+                                  backgroundColor: Theme.of(context).colorScheme.tertiary,
+                                  behavior: SnackBarBehavior.floating,
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 24,
                             ),
-                          );
-                        }
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(12),
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.tertiary.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         child: Icon(
-                          Icons.check,
-                          color: Colors.white,
+                          Icons.check_circle,
+                          color: Theme.of(context).colorScheme.tertiary,
                           size: 24,
                         ),
                       ),
+                    const SizedBox(width: 8),
+                    PopupMenuButton<_DeliveryAction>(
+                      tooltip: AppLocalizations.of(context)!.moreOptions,
+                      onSelected: (action) async {
+                        switch (action) {
+                          case _DeliveryAction.toggle:
+                            HapticFeedback.selectionClick();
+                            await provider.toggleDelivered(widget.delivery.id);
+                            break;
+                          case _DeliveryAction.remove:
+                            final removed = widget.delivery;
+                            HapticFeedback.vibrate();
+                            await provider.removeDelivery(widget.delivery.id);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(AppLocalizations.of(context)!.snackRemoved),
+                                  behavior: SnackBarBehavior.floating,
+                                  action: SnackBarAction(
+                                    label: AppLocalizations.of(context)!.undo,
+                                    onPressed: () async {
+                                      await provider.addDelivery(removed);
+                                    },
+                                  ),
+                                ),
+                              );
+                            }
+                            break;
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: _DeliveryAction.toggle,
+                          child: Row(
+                            children: [
+                              Icon(widget.delivery.delivered ? Icons.undo : Icons.check),
+                              const SizedBox(width: 8),
+                              Text(widget.delivery.delivered
+                                  ? AppLocalizations.of(context)!.markPending
+                                  : AppLocalizations.of(context)!.markDelivered),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          value: _DeliveryAction.remove,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.delete_outline),
+                              const SizedBox(width: 8),
+                              Text(AppLocalizations.of(context)!.remove),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  )
-                else
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.check_circle,
-                      color: Colors.green,
-                      size: 24,
-                    ),
-                  ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -229,3 +292,5 @@ class _DeliveryCardState extends State<DeliveryCard>
     );
   }
 }
+
+enum _DeliveryAction { toggle, remove }
