@@ -43,3 +43,11 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Carpetas específicas de plataforma (se regeneran con flutter create)
+/linux/
+/windows/
+/macos/
+/android/
+/ios/
+/web/
+
