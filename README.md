@@ -7,22 +7,29 @@ Aplicación Flutter para coordinar repartidores en bicicleta para entregas soste
 
 ```
 lib/
-├── main.dart                    # Punto de entrada
+├── main.dart                         # Punto de entrada (Providers + i18n + temas)
+├── l10n/                              # Localización (i18n)
+│   ├── app_es.arb                    # Español
+│   └── app_en.arb                    # Inglés
 ├── models/
-│   └── delivery.dart           # Modelo de Entrega
+│   └── delivery.dart                 # Modelo de Entrega (copyWith/JSON)
 ├── providers/
-│   ├── delivery_provider.dart  # Provider de entregas
-│   └── theme_provider.dart     # Provider de tema
+│   ├── delivery_provider.dart        # Estado de entregas (inmutable + persistencia)
+│   └── theme_provider.dart           # Tema claro/oscuro con SharedPreferences
 ├── screens/
-│   ├── home_screen.dart        # Pantalla principal
-│   ├── delivery_list_screen.dart # Pantalla de repartidor
-│   └── supervisor_screen.dart  # Pantalla de supervisor
+│   ├── home_screen.dart              # Pantalla principal
+│   ├── delivery_list_screen.dart     # Pantalla de repartidor (tabs + progreso)
+│   └── supervisor_screen.dart        # Panel de supervisor (filtros/búsqueda/orden)
 ├── widgets/
-│   ├── animated_bike.dart      # Bicicleta animada
-│   ├── delivery_card.dart      # Tarjeta de entrega
-│   └── progress_bar.dart       # Barra de progreso animada
+│   ├── animated_bike.dart            # Bicicleta animada con LayoutBuilder
+│   ├── delivery_card.dart            # Tarjeta con menú contextual y accesibilidad
+│   └── progress_bar.dart             # Barra de progreso animada y temática
 └── utils/
-    └── dummy_data.dart         # Datos de prueba
+    └── dummy_data.dart               # Datos de prueba
+
+test/
+├── widget_test.dart                  # Smoke test de arranque y título
+└── delivery_provider_test.dart       # Pruebas de progreso y conteos
 ```
 
 ## 🚀 Cómo Ejecutar
@@ -79,8 +86,8 @@ flutter test
 
 ## 🎨 Autores
 
-- [smuke123](https://github.com/smuke123).
-- [Kysgrall](https://github.com/f1f2f3f4f5f6f7).
+- [Edgar Santiago Ariza - smuke123](https://github.com/smuke123).
+- [Kevin Daniel Castro Mendoza - Kysgrall](https://github.com/f1f2f3f4f5f6f7).
 
 ---
 Desarrollado para el Challenge de GreenGo Logistics 
