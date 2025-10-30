@@ -27,15 +27,40 @@ lib/
 
 ## 🚀 Cómo Ejecutar
 
-1. **Instalar dependencias**:
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/smuke123/ChallengeFlutterGreenGo.git
+cd ChallengeFlutterGreenGo
+```
+
+### 2. Instalar dependencias
 ```bash
 flutter pub get
 ```
 
-2. **Ejecutar la aplicación**:
+### 3. Generar carpetas de plataforma
+Reemplaza `<SISTEMA>` con tu plataforma: `windows`, `linux`, `macos`, `android`, `ios`, o `web`
+
 ```bash
-flutter run 
+flutter create --platforms=<SISTEMA> .
 ```
+
+**Ejemplos:**
+- Windows: `flutter create --platforms=windows .`
+- Linux: `flutter create --platforms=linux .`
+- Android: `flutter create --platforms=android .`
+
+### 4. Ejecutar la aplicación
+Reemplaza `<SISTEMA>` con tu plataforma:
+
+```bash
+flutter run -d <SISTEMA>
+```
+
+**Ejemplos:**
+- Windows: `flutter run -d windows`
+- Linux: `flutter run -d linux`
+- Chrome: `flutter run -d chrome`
 
 ## 🎨 Autores
 
